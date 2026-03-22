@@ -1,0 +1,31 @@
+{
+  "run_name": "RecurrentGPT_CompressionNative",
+  "author": "devXyi",
+  "github_id": "devXyi",
+  "val_bpb": null,
+  "val_loss": null,
+  "artifact_bytes": null,
+  "seeds": [42, 1337, 2024],
+  "val_bpb_per_seed": [null, null, null],
+  "artifact_bytes_per_seed": [null, null, null],
+  "mean_val_bpb": null,
+  "std_val_bpb": null,
+  "hardware": "8xH100 SXM",
+  "training_time_seconds": 600,
+  "compressor": "zstd-22+dict",
+  "summary": "Recurrent GPT: 1 shared block x16 recurrences (268M effective), compression-native training stack (entropy reg, bitplane shaping, temporal correlation, Zipf alignment, TFAL), INT6 true-pack + ZSTD dict, per-token entropy routing, frequency attention gate",
+  "architecture": {
+    "type": "recurrent_transformer",
+    "unique_params": 16800000,
+    "effective_params": 268000000,
+    "model_dim": 1024,
+    "num_recurrences": 16,
+    "mlp_intermediate": 4096,
+    "num_heads": 8,
+    "num_kv_heads": 1,
+    "train_seq_len": 2048,
+    "activation": "relu2",
+    "quantization": "INT6_true_pack_per_row_mixed_INT5"
+  },
+  "notes": "Fill val_bpb, val_loss, artifact_bytes, and per_seed arrays after running 3 seeds. Mean and std auto-compute from seeds."
+}
