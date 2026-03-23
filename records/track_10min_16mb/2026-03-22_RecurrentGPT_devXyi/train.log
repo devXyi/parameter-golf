@@ -1,1 +1,13 @@
-Training placeholder — val_bpb to be filled after 3-seed run on 8xH100.
+Run pending — awaiting 8×H100 compute for 3-seed validation.
+Architecture and code complete. val_bpb to be reported after runs.
+
+Model config:
+  unique_params   : ~11.8M
+  effective @R=20 : ~236M
+  model_dim       : 768
+  num_recurrences : 20
+  mlp_intermediate: 3072
+  train_seq_len   : 4096
+  train_batch     : 1,572,864 tokens
+  quantization    : INT6 true-pack + ZSTD-22 + dict
+  artifact_est    : ~11-12 MB
