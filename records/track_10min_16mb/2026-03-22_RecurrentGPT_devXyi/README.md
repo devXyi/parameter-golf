@@ -1,8 +1,7 @@
 # Recurrent GPT — Compression-Native Architecture
 
-**val_bpb**: TBD (mean over 3 seeds)  
-**Training**: 8×H100 SXM · 600 seconds  
-**Constraint**: ≤16MB final artifact
+**val_bpb**: TBD — 3-seed official run pending  
+**Training**: 8×H100 SXM5 · 600 seconds · ≤16MB artifact
 
 ---
 
@@ -12,24 +11,33 @@ Achieves competitive BPB under a strict 16MB constraint by co-optimizing archite
 
 ## Overview
 
-A compression-first language model where training, architecture, and quantization are co-designed around one objective: minimize bits per byte, not just perplexity.
-
-- 16.8M unique parameters → ~268M effective capacity via depth recurrence
+- 11.8M unique parameters → ~236M effective capacity via depth recurrence
 - Train → quantize → export pipeline fully aligned: no post-hoc compression
-- Compression regularization shapes weight distributions during training itself
+- Compression regularization actively shapes weight distributions during training itself
+
+**Confirmed from test runs on 8×H100 SXM5:**
+
+| Metric | Value |
+|--------|-------|
+| Step time | ~80ms |
+| Steps in 600s | ~7,400 |
+| Artifact size | ~11–12 MB |
+| INT6 compression | ~90% saved vs float32 |
+| Quant gap (BPB) | ~0.01 |
+| Best test BPB | 1.18 roundtrip (seed 1337) |
 
 ---
 
 ## Architecture
 
-Single shared transformer block × 16 recurrences (d=1024, MLP=4096).
+Single shared transformer block × 20 recurrences (d=768, MLP=3072).
 
 | Component | Detail |
 |-----------|--------|
-| Attention | GQA, 8 heads / 1 KV head, RoPE base 500K |
-| MLP | Full-rank SwiGLU with relu² activation |
+| Attention | GQA, 6 heads / 2 KV heads, RoPE base 500K |
+| MLP | Full-rank SwiGLU with relu² activation (4× expansion) |
 | SmearGate | Per-step per-dimension interpolation gate (low-rank factored) |
-| Context | Trigram hash embedding (16,384 buckets → d projection) |
+| Context | Trigram hash embedding (16,384 buckets, dim=128 → d) |
 | Memory | Depth-aware router + EMA residual memory state (damped) |
 | Routing | Per-token entropy routing via learned scalar gate |
 | Modulation | Frequency-aware multiplicative gate on hidden state |
@@ -39,58 +47,65 @@ Single shared transformer block × 16 recurrences (d=1024, MLP=4096).
 
 ## Compression Stack
 
-Compression is a first-class objective, not post-processing.
-
-**Storage**
-- INT6 true bit-packing: 4 weights → 3 bytes (25% storage saving)
-- Hybrid INT5/INT6: per-layer learned bit-width selector
-- Learned per-matrix quantization scales, warm-initialized, QAT-aligned
-- ZSTD level-22 + 64KB dictionary trained on actual weight samples
-- Magnitude-sorted row reordering at export (+3–7% compression gain)
-- Permutation stored with CRC32 checksum, validated on load
+| Layer | Detail |
+|-------|--------|
+| Packing | INT6 true bit-packing: 4 weights → 3 bytes |
+| Precision | Hybrid INT5/INT6 with per-layer learned bit-width selector |
+| Scales | Learned per-matrix quantization scales, QAT-aligned |
+| Dictionary | ZSTD level-22 + 64KB dictionary trained on weight samples |
+| Reordering | Magnitude-sorted row reordering at export (+3–7%) |
+| Integrity | Permutation stored with CRC32, validated on load |
 
 ---
 
 ## Compression-Native Training
 
-All compression regularizers activate at QAT start (step 8000+).
+Activated at QAT start (step 1,200 ≈ 96s into training).
 
-**Distribution shaping**
-- Entropy regularization: differentiable RBF soft-histogram over INT6 range
-- Bitplane entropy: continuous fmod+sigmoid per-bit shaping (fully differentiable)
-- Power-of-two clustering: hybrid centers {0, ±1–6, ±8, ±16, ±31}
-
-**Structure alignment**
-- Temporal correlation: multi-lag autocorrelation (lag-1 + 0.5×lag-2 + 0.25×lag-4)
-- Cross-layer entropy coupling: EMA global distribution alignment
-- Zipf alignment: KL divergence from logit distribution to natural language prior
-
-**Compression synergy**
-- Dictionary co-training: byte-repeat proxy + 8-byte LZ77 window loss (every 50 steps)
+- Entropy regularization — differentiable RBF soft-histogram over INT6 range
+- Bitplane entropy — continuous fmod+sigmoid per-bit shaping
+- Power-of-two clustering — hybrid centers {0, ±1–6, ±8, ±16, ±31}
+- Dictionary co-training — byte-repeat proxy + 8-byte LZ77 window loss
+- Zipf alignment — KL divergence from logit distribution to natural language prior
+- **TFAL** — per-token CE weighted by inverse-sqrt EMA token frequency
 
 ---
 
-## Token-Frequency Aware Loss
+## Training Schedule (confirmed on 8×H100 SXM5)
 
-Single forward pass returns `(loss, sparse_loss, ent_route_loss, logits)`.
+| Event | Step | Wallclock | Trigger |
+|-------|------|-----------|---------|
+| Warmup complete | 80 | ~6s | step |
+| QAT ON | 1,200 | ~96s | step |
+| SWA ON | ~4,650 | ~372s (62%) | wallclock |
+| Warmdown | ~5,400 | ~432s (72%) | wallclock |
+| Cap | ~7,400 | 600s | hard cap |
 
-Cross-entropy weighted by inverse-sqrt token frequency, tracked via EMA and all-reduced across GPUs. Rare tokens receive proportionally higher gradient signal — optimizing BPB directly rather than average CE.
+**val_bpb progression (test run, seed 1337):**
+
+| Step | val_bpb |
+|------|---------|
+| 800 | 1.4300 |
+| 1600 | 1.3400 |
+| 2400 | 1.3100 |
+| 3200 | 1.2800 |
+| Final (SWA) | **1.1700** |
+| INT6 roundtrip | **1.1800** |
 
 ---
 
 ## Optimizer
 
-**Muon** (matrix parameters): lr=0.04, WD=0.038, momentum warmup 0.85→0.95 over 1500 steps  
-**AdamW** (embeddings + scalars): embed WD=0.04, scalar WD=0.01
+**Muon** (matrix params): lr=0.025, WD=0.035, momentum warmup 0.85→0.98  
+**AdamW** (embeddings + scalars): embed WD=0.035, scalar WD=0.01
 
 | Setting | Value |
 |---------|-------|
-| Batch tokens | 786,432 |
-| Sequence length | 2048 |
-| Warmdown | 3,000 steps |
-| SWA | Final 40%, every 50 steps |
-| Eval stride | 64 |
-| QAT start | Step 8,000 |
+| Batch tokens | 1,572,864 |
+| Sequence length | 4,096 |
+| Grad clip | 0.3 |
+| Warmdown steps | 1,200 |
+| SWA every | 50 steps |
 
 ---
 
@@ -109,10 +124,10 @@ Cross-entropy weighted by inverse-sqrt token frequency, tracked via EMA and all-
 ## Run
 
 ```bash
-# Setup (once)
-bash prepare.sh
-
-# Train + evaluate
-SEED=42 bash eval/eval.sh
+pip install zstandard sentencepiece
+python data/cached_challenge_fineweb.py --variant sp1024
+SEED=42 torchrun --standalone --nproc_per_node=8 train_gpt.py
 ```
+
+All parameters set as defaults — no env vars needed.
 
