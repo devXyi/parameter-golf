@@ -40,75 +40,75 @@ class Hyperparameters:
     seed           = int(os.environ.get("SEED", 1337))
 
     val_batch_size  = int(os.environ.get("VAL_BATCH_SIZE",  524_288))
-    val_loss_every  = int(os.environ.get("VAL_LOSS_EVERY",  1_000))
-    train_log_every = int(os.environ.get("TRAIN_LOG_EVERY", 200))
+    val_loss_every  = int(os.environ.get("VAL_LOSS_EVERY",  250))
+    train_log_every = int(os.environ.get("TRAIN_LOG_EVERY", 50))
 
-    iterations            = int(os.environ.get("ITERATIONS",           20_000))
-    warmdown_iters        = int(os.environ.get("WARMDOWN_ITERS",        3_000))
-    warmup_steps          = int(os.environ.get("WARMUP_STEPS",          20))
-    train_batch_tokens    = int(os.environ.get("TRAIN_BATCH_TOKENS",    786_432))
-    train_seq_len         = int(os.environ.get("TRAIN_SEQ_LEN",         2_048))
+    iterations            = int(os.environ.get("ITERATIONS",           9_000))
+    warmdown_iters        = int(os.environ.get("WARMDOWN_ITERS",        1_200))
+    warmup_steps          = int(os.environ.get("WARMUP_STEPS",          80))
+    train_batch_tokens    = int(os.environ.get("TRAIN_BATCH_TOKENS",    1_572_864))
+    train_seq_len         = int(os.environ.get("TRAIN_SEQ_LEN",         4_096))
     max_wallclock_seconds = float(os.environ.get("MAX_WALLCLOCK_SECONDS", 600.0))
     qk_gain_init          = float(os.environ.get("QK_GAIN_INIT",          1.5))
 
     vocab_size       = int(os.environ.get("VOCAB_SIZE",        1_024))
-    num_recurrences  = int(os.environ.get("NUM_RECURRENCES",   16))
-    model_dim        = int(os.environ.get("MODEL_DIM",         1_024))
-    num_heads        = int(os.environ.get("NUM_HEADS",         8))
-    num_kv_heads     = int(os.environ.get("NUM_KV_HEADS",      1))
-    mlp_intermediate = int(os.environ.get("MLP_INTERMEDIATE",  4_096))
+    num_recurrences  = int(os.environ.get("NUM_RECURRENCES",   20))
+    model_dim        = int(os.environ.get("MODEL_DIM",         768))
+    num_heads        = int(os.environ.get("NUM_HEADS",         6))
+    num_kv_heads     = int(os.environ.get("NUM_KV_HEADS",      2))
+    mlp_intermediate = int(os.environ.get("MLP_INTERMEDIATE",  3_072))
     tie_embeddings   = bool(int(os.environ.get("TIE_EMBEDDINGS", "1")))
     rope_base        = float(os.environ.get("ROPE_BASE",        500_000.0))
-    logit_softcap    = float(os.environ.get("LOGIT_SOFTCAP",    30.0))
+    logit_softcap    = float(os.environ.get("LOGIT_SOFTCAP",    15.0))
     bigram_hash_size = int(os.environ.get("BIGRAM_HASH_SIZE",   16_384))
-    bigram_hash_dim  = int(os.environ.get("BIGRAM_HASH_DIM",    256))
+    bigram_hash_dim  = int(os.environ.get("BIGRAM_HASH_DIM",    128))
 
     mem_decay_init       = float(os.environ.get("MEM_DECAY_INIT",       0.9))
     mem_damping          = float(os.environ.get("MEM_DAMPING",          0.99))
     entropy_reg_weight   = float(os.environ.get("ENTROPY_REG_WEIGHT",   0.005))
     depth_dropout_base_p = float(os.environ.get("DEPTH_DROPOUT_BASE_P", 0.15))
-    perturb_scale        = float(os.environ.get("PERTURB_SCALE",        0.01))
-    qat_noise_scale      = float(os.environ.get("QAT_NOISE_SCALE",      0.01))
-    qat_start_step       = int(os.environ.get("QAT_START_STEP",         8_000))
-    qat_clip_val         = float(os.environ.get("QAT_CLIP_VAL",         1.5))
+    perturb_scale        = float(os.environ.get("PERTURB_SCALE",        0.007))
+    qat_noise_scale      = float(os.environ.get("QAT_NOISE_SCALE",      0.003))
+    qat_start_step       = int(os.environ.get("QAT_START_STEP",         1_200))
+    qat_clip_val         = float(os.environ.get("QAT_CLIP_VAL",         1.6))
     swa_start_frac       = float(os.environ.get("SWA_START_FRAC",       0.4))
     swa_every            = int(os.environ.get("SWA_EVERY",               50))
     eval_stride_div      = int(os.environ.get("EVAL_STRIDE_DIV",        32))
     zstd_dict_size       = int(os.environ.get("ZSTD_DICT_SIZE",         65_536))
-    mag_prune_frac       = float(os.environ.get("MAG_PRUNE_FRAC",        0.03))   # 3% pruning
-    ent_weight           = float(os.environ.get("ENT_WEIGHT",           1e-4))
-    ent_weight_qat       = float(os.environ.get("ENT_WEIGHT_QAT",       5e-5))
-    pow2_weight          = float(os.environ.get("POW2_WEIGHT",          5e-5))
-    dict_reg_weight      = float(os.environ.get("DICT_REG_WEIGHT",      2e-5))
+    mag_prune_frac       = float(os.environ.get("MAG_PRUNE_FRAC",        0.04))   # 3% pruning
+    ent_weight           = float(os.environ.get("ENT_WEIGHT",           3e-5))
+    ent_weight_qat       = float(os.environ.get("ENT_WEIGHT_QAT",       1e-5))
+    pow2_weight          = float(os.environ.get("POW2_WEIGHT",          1.5e-5))
+    dict_reg_weight      = float(os.environ.get("DICT_REG_WEIGHT",      3e-6))
     dict_reg_centroids   = int(os.environ.get("DICT_REG_CENTROIDS",     256))
-    dyn_rec_sparse_w     = float(os.environ.get("DYN_REC_SPARSE_W",     1e-3))
-    dyn_rec_threshold    = float(os.environ.get("DYN_REC_THRESHOLD",    0.05))
+    dyn_rec_sparse_w     = float(os.environ.get("DYN_REC_SPARSE_W",     7e-4))
+    dyn_rec_threshold    = float(os.environ.get("DYN_REC_THRESHOLD",    0.06))
     # nuclear combo
-    ent_route_w          = float(os.environ.get("ENT_ROUTE_W",          1e-3))  # entropy routing sparsity
-    zipf_align_w         = float(os.environ.get("ZIPF_ALIGN_W",         2e-4))  # logit Zipf alignment
+    ent_route_w          = float(os.environ.get("ENT_ROUTE_W",          4e-4))  # entropy routing sparsity
+    zipf_align_w         = float(os.environ.get("ZIPF_ALIGN_W",         5e-4))  # logit Zipf alignment
     freq_gate_init       = float(os.environ.get("FREQ_GATE_INIT",      -1.0))   # freq attention gate init
-    dict_cotrain_w       = float(os.environ.get("DICT_COTRAIN_W",       1e-3))  
-    dict_cotrain_every   = int(os.environ.get("DICT_COTRAIN_EVERY",     50))    
+    dict_cotrain_w       = float(os.environ.get("DICT_COTRAIN_W",       2e-6))  
+    dict_cotrain_every   = int(os.environ.get("DICT_COTRAIN_EVERY",     40))    
     mixed_bitwidth       = bool(int(os.environ.get("MIXED_BITWIDTH",    "1")))
-    bit_cost_w           = float(os.environ.get("BIT_COST_W",           2e-4))  
-    bit_ent_threshold    = float(os.environ.get("BIT_ENT_THRESHOLD",    3.5))   
-    cross_ent_w          = float(os.environ.get("CROSS_ENT_W",          3e-5))
-    temporal_corr_w      = float(os.environ.get("TEMPORAL_CORR_W",      5e-5))
+    bit_cost_w           = float(os.environ.get("BIT_COST_W",           1.2e-4))  
+    bit_ent_threshold    = float(os.environ.get("BIT_ENT_THRESHOLD",    3.0))   
+    cross_ent_w          = float(os.environ.get("CROSS_ENT_W",          0.0))
+    temporal_corr_w      = float(os.environ.get("TEMPORAL_CORR_W",      0.0))
     # new
     weight_reorder       = bool(int(os.environ.get("WEIGHT_REORDER",    "1")))  
     learned_centers_n    = int(os.environ.get("LEARNED_CENTERS_N",      64))    
-    learned_centers_w    = float(os.environ.get("LEARNED_CENTERS_W",    3e-5))  
+    learned_centers_w    = float(os.environ.get("LEARNED_CENTERS_W",    1e-5))  
 
-    embed_lr                   = float(os.environ.get("EMBED_LR",                   0.6))
+    embed_lr                   = float(os.environ.get("EMBED_LR",                   0.5))
     tied_embed_lr              = float(os.environ.get("TIED_EMBED_LR",              0.05))
     tied_embed_init_std        = float(os.environ.get("TIED_EMBED_INIT_STD",        0.005))
-    matrix_lr                  = float(os.environ.get("MATRIX_LR",                  0.02))
+    matrix_lr                  = float(os.environ.get("MATRIX_LR",                  0.025))
     scalar_lr                  = float(os.environ.get("SCALAR_LR",                  0.02))
-    muon_momentum              = float(os.environ.get("MUON_MOMENTUM",              0.99))
-    muon_backend_steps         = int(os.environ.get("MUON_BACKEND_STEPS",           5))
+    muon_momentum              = float(os.environ.get("MUON_MOMENTUM",              0.98))
+    muon_backend_steps         = int(os.environ.get("MUON_BACKEND_STEPS",           4))
     muon_momentum_warmup_start = float(os.environ.get("MUON_MOMENTUM_WARMUP_START", 0.92))
     muon_momentum_warmup_steps = int(os.environ.get("MUON_MOMENTUM_WARMUP_STEPS",   1_500))
-    muon_wd                    = float(os.environ.get("MUON_WD",                    0.04))
+    muon_wd                    = float(os.environ.get("MUON_WD",                    0.035))
     beta1                      = float(os.environ.get("BETA1",                      0.9))
     beta2                      = float(os.environ.get("BETA2",                      0.95))
     adam_eps                   = float(os.environ.get("ADAM_EPS",                   1e-8))
@@ -201,8 +201,6 @@ def unpack_int6(packed: np.ndarray, pad: int, orig_shape: tuple) -> np.ndarray:
     n = len(signed) - pad if pad > 0 else len(signed)
     return signed[:n].reshape(orig_shape)
 
-
-# ZSTD DICTIONARY COMPRESSION
 
 def _zstd_compress(data: bytes, zdict: bytes | None = None, level: int = 22) -> bytes:
     if not _HAVE_ZSTD: return zlib.compress(data, level=9)
@@ -460,8 +458,6 @@ def load_validation_tokens(pattern: str, seq_len: int) -> Tensor:
     return tokens[: usable + 1]
 
 
-# SLIDING WINDOW EVALUATION
-
 def eval_val(args, model, rank, world_size, device, _ga,
              val_tokens, bbl, hsl, ibl):
     seq_len = args.train_seq_len
@@ -694,8 +690,6 @@ def dict_cotrain_loss(module: nn.Module) -> Tensor:
     return run_loss + 0.5 * win_loss
 
 
-# MIXED BIT-WIDTH COST LOSS
-
 _INT5_MAX = 15   # INT5 symmetric range [-15, 15]
 
 def bit_cost_loss(module: nn.Module, ent_threshold: float = 3.5) -> Tensor:
@@ -763,8 +757,6 @@ def apply_mixed_bitwidth_quant(w: Tensor, bit_selector: Tensor,
     wdq = p6 * w6 + (1.0 - p6) * w5
     return w + (wdq - w).detach()
 
-
-# CROSS-LAYER ENTROPY COUPLING
 
 def cross_layer_entropy_loss(module: nn.Module) -> Tensor:
     """Penalise layers more entropic than global EMA pool."""
@@ -906,8 +898,6 @@ class DictAwareReg:
         return total if total is not None else torch.tensor(0.0)
 
 
-# TRANSFORMER MODULES
-
 class RMSNorm(nn.Module):
     def __init__(self, dim: int, eps: float | None = None):
         super().__init__()
@@ -1029,7 +1019,6 @@ class GPT(nn.Module):
         self.hist_logit = nn.Parameter(torch.tensor(-2.944))
         self.imp_w      = nn.Parameter(torch.zeros(d))
 
-        # calibration + prior
         self.logit_temp = nn.Parameter(torch.ones(1))
         self.freq_bias  = nn.Parameter(torch.zeros(hp.vocab_size))
 
@@ -1288,8 +1277,8 @@ def main() -> None:
     })
 
     la, lc = 0.0, 0; t0 = time.time()
-    token_freq = torch.ones(args.vocab_size, device=device)  # EMA token counts for TFAL
-    swa_start = int(args.iterations * (1.0 - args.swa_start_frac))  # start at 60% done
+    token_freq = torch.ones(args.vocab_size, device=device)
+    swa_start = int(args.iterations * (1.0 - args.swa_start_frac))
     swa: SWAState | None = None                    # fix: must be initialised before loop
     if master: print(f"\nTraining {args.iterations} iters | cap {args.max_wallclock_seconds}s")
 
@@ -1303,15 +1292,16 @@ def main() -> None:
             if master:
                 print(f"step {step}: INT6 QAT ON (clip=+-{args.qat_clip_val}, noise={args.qat_noise_scale})")
             if args.mixed_bitwidth and hasattr(raw_model, 'bit_selectors'):
-                large_qat = [
-                    m for m in raw_model.modules()
-                    if isinstance(m, QuantLinear) and m.weight.numel() > INT_KEEP_FLOAT_MAX_NUMEL
-                ]
-                for i, m in enumerate(large_qat):
-                    sel_idx = i % len(raw_model.bit_selectors)
-                    m._layer_bit_selector = raw_model.bit_selectors[sel_idx]
-                QuantLinear._bit_selector = None   # per-layer attrs take priority
-                if master: print(f"  Per-layer mixed bitwidth: {len(large_qat)} matrices, {len(raw_model.bit_selectors)} selectors")
+                # Use named_modules to record name→selector mapping (same order as export)
+                bit_map = []  # (weight_param_name, sel_idx)
+                for name, m in raw_model.named_modules():
+                    if isinstance(m, QuantLinear) and m.weight.numel() > INT_KEEP_FLOAT_MAX_NUMEL:
+                        sel_idx = len(bit_map) % len(raw_model.bit_selectors)
+                        m._layer_bit_selector = raw_model.bit_selectors[sel_idx]
+                        bit_map.append((name + ".weight", sel_idx))
+                raw_model._bit_map = bit_map  # saved for export alignment
+                QuantLinear._bit_selector = None
+                if master: print(f"  Per-layer mixed bitwidth: {len(bit_map)} matrices mapped")
             with torch.no_grad():
                 _dummy = torch.zeros(1, 1, device=device, dtype=torch.int64)
                 raw_model.eval()
@@ -1329,10 +1319,12 @@ def main() -> None:
 
         if step < args.warmup_steps:
             lrs = (step + 1) / args.warmup_steps
-        elif step < args.iterations - args.warmdown_iters:
+        elif elapsed < args.max_wallclock_seconds * 0.72:
             lrs = 1.0
         else:
-            lrs = max(0.0, (args.iterations - step) / args.warmdown_iters)
+            remaining = max(0.0, args.max_wallclock_seconds - elapsed)
+            warmdown_window = args.max_wallclock_seconds * 0.18
+            lrs = max(0.05, remaining / warmdown_window)
 
         for pg in opt_adam.param_groups: pg["lr"] = pg["base_lr"] * lrs
         for pg in opt_muon.param_groups: pg["lr"] = args.matrix_lr * lrs
@@ -1352,7 +1344,7 @@ def main() -> None:
         with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
             _, sparse_loss, ent_route_loss, raw_logits = model(
                 x, y, entropy_reg=QuantLinear.qat_enabled)
-        tok_w = (token_freq.clamp_min(1e-6) ** -0.5)
+        tok_w = (token_freq.clamp_min(1e-6) ** -0.3)
         tok_w = (tok_w / tok_w.mean()).clamp(max=10.0)
         flat_y      = y.view(-1)
         ce_per_tok  = F.cross_entropy(raw_logits.float().view(-1, raw_logits.size(-1)),
@@ -1369,7 +1361,7 @@ def main() -> None:
                 ent_l = model_entropy_loss(raw_model)
             total_loss = total_loss + ew * ent_l
 
-        if QuantLinear.qat_enabled and step % 50 == 0 and args.zipf_align_w > 0:
+        if QuantLinear.qat_enabled and step % 25 == 0 and args.zipf_align_w > 0:
             total_loss = total_loss + args.zipf_align_w * zipf_alignment_loss(
                 raw_logits.detach()[:, ::8].reshape(-1, raw_logits.size(-1))[:512])
         if QuantLinear.qat_enabled:
@@ -1399,23 +1391,22 @@ def main() -> None:
             nn.utils.clip_grad_norm_(raw_model.parameters(), args.grad_clip_norm)
         for o in opts: o.step()
         restore_fp32(raw_model)
-        if QATLinear.qat_enabled and step % 500 == 0:
+        if QuantLinear.qat_enabled and step % 500 == 0:  # post-training only (step always >500)
             with torch.no_grad():
                 for p in raw_model.parameters():
                     if p.ndim == 2 and p.numel() > INT_KEEP_FLOAT_MAX_NUMEL:
                         threshold = (p.abs().max(dim=1, keepdim=True).values * 0.03).clamp_min(1e-6)
                         p.data *= (p.abs() >= threshold).float()
-        if QuantLinear.qat_enabled and args.mag_prune_frac > 0 and (step % 100 == 0):
+        if False:  # pruning moved to post-training export only
             with torch.no_grad():
                 for p in raw_model.parameters():
                     if p.numel() <= INT_KEEP_FLOAT_MAX_NUMEL or not p.is_floating_point(): continue
                     thresh = torch.quantile(p.abs().flatten(), args.mag_prune_frac)
                     p.data[p.abs() < thresh] = 0.0
 
-        if step >= swa_start and (step - swa_start) % args.swa_every == 0:
+        if elapsed > args.max_wallclock_seconds * 0.62 and step % args.swa_every == 0:
             if swa is None: swa = SWAState(raw_model)
             swa.update(raw_model)
-            # Also EMA-average learned_cents (outside DDP scope)
             if swa.n > 1:
                 for p_swa, p_cur in zip([learned_cents.centers], [learned_cents.centers.data]):
                     p_swa.data.lerp_(p_cur.cpu(), 1.0 / swa.n)
@@ -1442,23 +1433,23 @@ def main() -> None:
 
     # -- INT6 true-pack + zstd-dict compression -----------------------------
     if master:
+        if args.mag_prune_frac > 0:
+            with torch.no_grad():
+                for p in raw_model.parameters():
+                    if p.ndim == 2 and p.numel() > INT_KEEP_FLOAT_MAX_NUMEL:
+                        thresh = (p.abs().max(dim=1, keepdim=True).values
+                                  * args.mag_prune_frac).clamp_min(1e-6)
+                        p.data *= (p.abs() >= thresh).float()
         sd = {k: v.detach() for k, v in raw_model.state_dict().items()}
         ls = extract_learned_scales(raw_model)
         if master and ls:
             print(f"Exporting with {len(ls)} learned quant scales (train/export aligned)")
         # Build bit_selector_map: name -> selector param for INT5 export path
+        # Use _bit_map stored at QAT start -- same named_modules order guarantees alignment
         bsm: dict = {}
-        if hasattr(raw_model, 'bit_selectors'):
-            large_qat_names = [
-                n for n, p in raw_model.named_parameters()
-                if p.numel() > INT_KEEP_FLOAT_MAX_NUMEL
-                and not any(c in n for c in CONTROL_PATTERNS)
-                and p.is_floating_point()
-                and 'bit_selector' not in n
-            ]
-            for i, n in enumerate(large_qat_names):
-                sel_idx = i % len(raw_model.bit_selectors)
-                bsm[n]  = raw_model.bit_selectors[sel_idx].detach()
+        if hasattr(raw_model, "_bit_map") and hasattr(raw_model, "bit_selectors"):
+            for name, sel_idx in raw_model._bit_map:
+                bsm[name] = raw_model.bit_selectors[sel_idx].detach()
         obj, stats = quantize_state_dict(sd, args.zstd_dict_size,
                                           learned_scales=ls,
                                           weight_reorder=args.weight_reorder,
